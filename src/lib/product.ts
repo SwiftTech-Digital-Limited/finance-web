@@ -1,0 +1,6 @@
+export const PRODUCT_NAME =
+  process.env.NEXT_PUBLIC_PRODUCT_NAME?.trim() || "KoboPlan";
+
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  "http://localhost:4000/api/v1";
