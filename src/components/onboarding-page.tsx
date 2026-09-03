@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Check, Landmark, ListTree, PiggyBank, Sparkles, WalletCards } from "lucide-react";
 import { createResource, financeApi, listResource, queryKeys } from "@/lib/api";
@@ -12,6 +13,7 @@ import { Field, LoadingBlock } from "@/components/ui-kit";
 const steps = ["Welcome", "First account", "Buckets", "Income source", "First rule", "Finish"];
 
 export function OnboardingPage() {
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [account, setAccount] = useState({ name: "", type: "bank", opening: "0" });
   const [bucketNames, setBucketNames] = useState(["Everyday", "Savings", "Investing"]);
@@ -45,7 +47,7 @@ export function OnboardingPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.all });
-      if (step === 5) window.location.assign("/dashboard"); else setStep((value) => value + 1);
+      if (step === 5) router.push("/dashboard"); else setStep((value) => value + 1);
     },
   });
   const next = () => {

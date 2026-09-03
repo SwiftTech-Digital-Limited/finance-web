@@ -2,7 +2,7 @@ import { apiData, apiRequest, toQuery } from "./client";
 import type {
   Account, Allocation, AllocationPreview, AllocationRule, Bucket, Category,
   ChartDatum, DashboardData, IncomeSource, ListParams, Reallocation,
-  Transaction, User,
+  RuleSnapshot, Transaction, User,
 } from "./types";
 
 export type ResourceName = "accounts" | "buckets" | "categories" | "income-sources" | "allocation-rules";
@@ -62,7 +62,7 @@ export const financeApi = {
     return { items: response.data, pagination: response.pagination };
   },
   transaction: (id: string) => apiData<Transaction>(`/transactions/${id}`),
-  lineage: (id: string) => apiData<{ incomeTransaction?: Transaction; transaction?: Transaction; allocations: Allocation[]; allocatedTotalMinor: number; unallocatedAmountMinor: number; allocationRuleSnapshot?: { name?: string } }>(`/transactions/${id}/lineage`),
+  lineage: (id: string) => apiData<{ incomeTransaction?: Transaction; transaction?: Transaction; allocations: Allocation[]; allocatedTotalMinor: number; unallocatedAmountMinor: number; allocationRuleSnapshot?: RuleSnapshot }>(`/transactions/${id}/lineage`),
   reallocations: async (params: Record<string, string | number | undefined>) => {
     const response = await apiRequest<Reallocation[]>(`/reallocations${toQuery(params)}`);
     return { items: response.data, pagination: response.pagination };
@@ -71,7 +71,7 @@ export const financeApi = {
     const response = await apiRequest<Allocation[]>(`/allocations${toQuery(params)}`);
     return { items: response.data, pagination: response.pagination };
   },
-  monthlySetting: (year: number, month: number) => apiData<{ year: number; month: number; idealSpendMinor: number; maximumSpendMinor: number; notes?: string; spendingProgress?: unknown }>(`/monthly-settings/${year}/${month}`),
+  monthlySetting: (year: number, month: number) => apiData<{ year: number; month: number; idealSpendMinor: number; maximumSpendMinor: number; notes?: string; spendingProgress?: boolean }>(`/monthly-settings/${year}/${month}`),
   saveMonthlySetting: (year: number, month: number, input: unknown) => apiData<unknown>(`/monthly-settings/${year}/${month}`, { method: "PUT", body: input }),
   analytics: (path: string, params: { dateFrom?: string; dateTo?: string }) => apiData<ChartDatum[]>(`/analytics/${path}${toQuery(params)}`),
 };

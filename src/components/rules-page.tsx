@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { Archive, Beaker, Edit3, Plus, Power, Trash2 } from "lucide-react";
 import { archiveResource, createResource, financeApi, getResource, listResource, queryKeys, updateResource } from "@/lib/api";
-import type { AllocationPreview, AllocationRule, Bucket, IncomeSource, RuleAllocation } from "@/lib/api/types";
+import type { AllocationPreview, AllocationRule, Bucket, IncomeSource } from "@/lib/api/types";
 import { errorMessage } from "@/lib/errors";
 import { formatMoney, parseMoneyInput } from "@/lib/money";
 import { formatPercentage, parsePercentageInput } from "@/lib/percentage";

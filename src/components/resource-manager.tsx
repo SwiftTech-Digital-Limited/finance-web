@@ -84,10 +84,10 @@ function CardActions({ edit, archive }: { edit: () => void; archive: () => void 
 
 function ResourceForm({ kind, resource, accounts, busy, error, onClose, onSave }: { kind: Kind; resource: Resource | null | "new"; accounts: Account[]; busy: boolean; error: string; onClose: () => void; onSave: (id: string | undefined, payload: unknown) => void }) {
   const editing = resource && resource !== "new" ? resource : null;
-  const values = editing ? {
-    ...defaults, name: editing.name, description: editing.description || "", icon: editing.icon || "",
-    type: "type" in editing ? editing.type || "" : "", institutionName: "institutionName" in editing ? editing.institutionName || "" : "",
-    currency: "currency" in editing ? editing.currency || "NGN" : "NGN", includeInNetWorth: "includeInNetWorth" in editing ? editing.includeInNetWorth !== false : true,
+  const values: FormValues = editing ? {
+    ...defaults, name: editing.name, description: editing.description || "", icon: "icon" in editing && typeof editing.icon === "string" ? editing.icon : "",
+    type: "type" in editing && typeof editing.type === "string" ? editing.type : "", institutionName: "institutionName" in editing && typeof editing.institutionName === "string" ? editing.institutionName : "",
+    currency: "currency" in editing && typeof editing.currency === "string" ? editing.currency : "NGN", includeInNetWorth: "includeInNetWorth" in editing ? editing.includeInNetWorth !== false : true,
     displayOrder: "displayOrder" in editing ? String(editing.displayOrder || 0) : "0",
     defaultAccountId: "defaultAccountId" in editing ? typeof editing.defaultAccountId === "string" ? editing.defaultAccountId : editing.defaultAccountId?._id || "" : "",
   } : defaults;

@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react/no-unescaped-entities */
+
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format, subMonths } from "date-fns";
@@ -7,7 +9,7 @@ import { ChevronLeft, ChevronRight, Target } from "lucide-react";
 import { financeApi, queryKeys } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
 import { errorMessage } from "@/lib/errors";
-import { formatMoney, parseMoneyInput } from "@/lib/money";
+import { parseMoneyInput } from "@/lib/money";
 import { Field, LoadingBlock, PageHeader } from "@/components/ui-kit";
 
 export function MonthlyPage() {

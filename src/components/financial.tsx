@@ -37,7 +37,8 @@ export function BucketCard({ bucket }: { bucket: Bucket }) {
 }
 
 export function TransactionRow({ event, linked = true }: { event: FinancialEvent | Transaction; linked?: boolean }) {
-  const reallocation = event.eventKind === "reallocation" || Boolean(event.reallocation);
+  const financialEvent = event as FinancialEvent;
+  const reallocation = financialEvent.eventKind === "reallocation" || Boolean(financialEvent.reallocation);
   const transfer = event.displayType === "transfer" || event.type === "transfer" || event.type === "transfer_out" || event.type === "transfer_in";
   const expense = event.type === "expense";
   const income = event.type === "income";
@@ -55,8 +56,8 @@ export function TransactionRow({ event, linked = true }: { event: FinancialEvent
         : expense
           ? `From ${refName(event.bucket || event.bucketId, "bucket")}`
           : event.status || "Posted";
-  const date = event.transactionDate || event.createdAt || event.reallocation?.date || event.reallocation?.createdAt;
-  const amount = event.amountMinor ?? event.reallocation?.amountMinor ?? 0;
+  const date = event.transactionDate || event.createdAt || financialEvent.reallocation?.date || financialEvent.reallocation?.createdAt;
+  const amount = event.amountMinor ?? financialEvent.reallocation?.amountMinor ?? 0;
   const Icon = reallocation ? FolderInput : transfer ? ArrowLeftRight : income ? ArrowDownLeft : expense ? ArrowUpRight : RotateCcw;
   const body = (
     <div className={cn("transaction-row", event.status === "void" && "void-row")}>

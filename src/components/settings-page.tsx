@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation, useQueries } from "@tanstack/react-query";
 import { Archive, ChevronRight, LockKeyhole, Tags, UserRound } from "lucide-react";
@@ -10,11 +11,12 @@ import { errorMessage } from "@/lib/errors";
 import { ArchivedBadge, EmptyState, ErrorState, Field, LoadingBlock, PageHeader } from "@/components/ui-kit";
 
 export function SettingsPage() {
+  const router = useRouter();
   const { user, setUser } = useAuth();
   const [profile, setProfile] = useState({ name: user?.name || "", timezone: user?.timezone || "Africa/Lagos", defaultCurrency: user?.defaultCurrency || "NGN" });
   const [password, setPassword] = useState({ currentPassword: "", newPassword: "" });
   const profileMutation = useMutation({ mutationFn: () => financeApi.updateProfile(profile), onSuccess: (updated) => setUser(updated) });
-  const passwordMutation = useMutation({ mutationFn: () => financeApi.changePassword(password), onSuccess: () => { setPassword({ currentPassword: "", newPassword: "" }); setTimeout(() => window.location.assign("/login"), 800); } });
+  const passwordMutation = useMutation({ mutationFn: () => financeApi.changePassword(password), onSuccess: () => { setPassword({ currentPassword: "", newPassword: "" }); setTimeout(() => router.push("/login"), 800); } });
   return <><PageHeader eyebrow="Settings" title="Your preferences" description="Manage your profile, security, expense categories, and archived configuration." /><div className="settings-grid"><section className="settings-panel"><header><span><UserRound /></span><div><h2>Profile</h2><p>Used for timezone-aware periods and currency display.</p></div></header><form onSubmit={(event) => { event.preventDefault(); profileMutation.mutate(); }}><Field label="Name"><input value={profile.name} onChange={(event) => setProfile({ ...profile, name: event.target.value })} /></Field><Field label="Timezone"><select value={profile.timezone} onChange={(event) => setProfile({ ...profile, timezone: event.target.value })}><option value="Africa/Lagos">Africa/Lagos (WAT)</option><option value="Africa/Accra">Africa/Accra (GMT)</option><option value="Europe/London">Europe/London</option><option value="America/New_York">America/New_York</option></select></Field><Field label="Default currency"><select value={profile.defaultCurrency} onChange={(event) => setProfile({ ...profile, defaultCurrency: event.target.value })}><option value="NGN">NGN - Nigerian naira</option></select></Field>{profileMutation.error && <p className="form-error-box">{errorMessage(profileMutation.error)}</p>}{profileMutation.isSuccess && <p className="success-callout">Profile updated.</p>}<button className="button-primary" disabled={profileMutation.isPending}>Save profile</button></form></section><section className="settings-panel"><header><span><LockKeyhole /></span><div><h2>Security</h2><p>Changing your password revokes every active session.</p></div></header><form onSubmit={(event) => { event.preventDefault(); passwordMutation.mutate(); }}><Field label="Current password"><input type="password" autoComplete="current-password" value={password.currentPassword} onChange={(event) => setPassword({ ...password, currentPassword: event.target.value })} /></Field><Field label="New password" hint="At least 10 characters"><input type="password" autoComplete="new-password" minLength={10} value={password.newPassword} onChange={(event) => setPassword({ ...password, newPassword: event.target.value })} /></Field>{passwordMutation.error && <p className="form-error-box">{errorMessage(passwordMutation.error)}</p>}{passwordMutation.isSuccess && <p className="success-callout">Password changed. Returning to sign in...</p>}<button className="button-primary" disabled={passwordMutation.isPending || password.newPassword.length < 10}>Change password</button></form></section></div><section className="settings-links"><Link href="/settings/categories"><span><Tags /></span><div><h2>Expense categories</h2><p>Create, edit, search, and archive spending labels.</p></div><ChevronRight /></Link><Link href="/settings/archived"><span><Archive /></span><div><h2>Archived resources</h2><p>Review configuration preserved for history and balances.</p></div><ChevronRight /></Link></section></>;
 }
 

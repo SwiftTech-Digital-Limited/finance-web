@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, ArrowLeftRight, Check, CircleDollarSign, FolderInput, Plus, ReceiptText, Trash2 } from "lucide-react";
@@ -60,7 +60,7 @@ export function AddMoneyPage() {
   const [accounts, buckets, categories, sources] = results.map((result) => result.data?.items || []) as [Account[], Bucket[], Category[], IncomeSource[]];
   const form = useForm<FlowValues>({ resolver: zodResolver(flowSchema), defaultValues: defaults });
   const splits = useFieldArray({ control: form.control, name: "splits" });
-  const isSplit = form.watch("split");
+  const isSplit = useWatch({ control: form.control, name: "split" });
   const mutation = useMutation({
     mutationFn: async (values: FlowValues) => {
       const parsed = parseMoneyInput(values.amount);

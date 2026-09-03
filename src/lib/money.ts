@@ -13,11 +13,11 @@ export function parseMoneyInput(value: string, allowZero = false): MoneyParseRes
   }
   const normalized = input.replaceAll(",", "");
   const [whole, fraction = ""] = normalized.split(".");
-  const minor = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0") || "0");
+  const minor = BigInt(whole) * BigInt(100) + BigInt(fraction.padEnd(2, "0") || "0");
   if (minor > BigInt(Number.MAX_SAFE_INTEGER)) {
     return { ok: false, message: "This amount is too large." };
   }
-  if (minor === 0n && !allowZero) {
+  if (minor === BigInt(0) && !allowZero) {
     return { ok: false, message: "Amount must be greater than zero." };
   }
   return { ok: true, amountMinor: Number(minor) };

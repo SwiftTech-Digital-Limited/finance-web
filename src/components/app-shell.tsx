@@ -38,7 +38,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!restoring && !user) router.replace("/login");
   }, [restoring, user, router]);
-  useEffect(() => { setMenuOpen(false); setQuickOpen(false); }, [pathname]);
 
   if (restoring || !user) return <FullPageLoading />;
 
@@ -52,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p>{section.label}</p>
               {section.items.map((item) => {
                 const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return <Link className={cn("nav-link", active && "active")} href={item.href} key={item.href}><item.icon aria-hidden="true" /><span>{item.label}</span></Link>;
+                return <Link className={cn("nav-link", active && "active")} href={item.href} key={item.href} onClick={() => setMenuOpen(false)}><item.icon aria-hidden="true" /><span>{item.label}</span></Link>;
               })}
             </div>
           ))}
@@ -69,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <p className="topbar-context">Your money, clearly assigned</p>
           <div className="quick-add-wrap">
             <button className="quick-add-button" onClick={() => setQuickOpen((value) => !value)} aria-expanded={quickOpen}><Plus /><span>Add</span><ChevronDown /></button>
-            {quickOpen && <QuickMenu />}
+            {quickOpen && <QuickMenu onNavigate={() => setQuickOpen(false)} />}
           </div>
         </header>
         <main className="page-content">{children}</main>
@@ -86,14 +85,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function QuickMenu() {
+function QuickMenu({ onNavigate }: { onNavigate: () => void }) {
   const items = [
     { href: "/add?flow=income", label: "Add income", text: "Record and assign money", icon: CircleDollarSign },
     { href: "/add?flow=expense", label: "Add expense", text: "Spend from an account and bucket", icon: ReceiptText },
     { href: "/add?flow=transfer", label: "Move money", text: "Transfer between accounts", icon: ArrowLeftRight },
     { href: "/add?flow=reallocate", label: "Change its purpose", text: "Reallocate between buckets", icon: FolderCog },
   ];
-  return <div className="quick-menu">{items.map((item) => <Link href={item.href} key={item.href}><item.icon /><span><b>{item.label}</b><small>{item.text}</small></span></Link>)}</div>;
+  return <div className="quick-menu">{items.map((item) => <Link href={item.href} key={item.href} onClick={onNavigate}><item.icon /><span><b>{item.label}</b><small>{item.text}</small></span></Link>)}</div>;
 }
 
 function MobileLink({ href, label, icon: Icon, active }: { href: string; label: string; icon: typeof Menu; active: boolean }) {

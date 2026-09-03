@@ -1,17 +1,17 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, ArrowLeft, GitBranch, Plus, ShieldAlert, Trash2 } from "lucide-react";
+import { ArrowLeft, CircleDollarSign, GitBranch, Plus, ShieldAlert, Trash2 } from "lucide-react";
 import { financeApi, listResource, queryKeys } from "@/lib/api";
-import type { Allocation, Bucket, RuleAllocation, Transaction } from "@/lib/api/types";
+import type { Allocation, RuleAllocation } from "@/lib/api/types";
 import { errorMessage } from "@/lib/errors";
 import { createIdempotencyKey } from "@/lib/idempotency";
 import { formatMoney, parseMoneyInput } from "@/lib/money";
 import { refName, TransactionRow } from "@/components/financial";
-import { ArchivedBadge, ErrorState, Field, LoadingBlock, Modal, MoneyAmount, PageHeader, SubmitButton } from "@/components/ui-kit";
+import { ArchivedBadge, ErrorState, Field, LoadingBlock, Modal, MoneyAmount, PageHeader } from "@/components/ui-kit";
 
 export function TransactionDetail({ id }: { id: string }) {
   const queryClient = useQueryClient();
