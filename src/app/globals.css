@@ -388,6 +388,9 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .money-amount { font-variant-numeric: tabular-nums; letter-spacing: -.025em; }
 .archived-badge { display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .42rem; border-radius: 999px; background: #eef0ee; color: #6e7772; font-size: .58rem; font-weight: 750; text-transform: uppercase; }
 .archived-badge svg { width: .65rem; }
+.resource-statuses { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .3rem; }
+.position-badge { display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .42rem; border-radius: 999px; background: #f1eee8; color: #766a58; font-size: .58rem; font-weight: 750; text-transform: uppercase; }
+.position-badge svg { width: .65rem; height: .65rem; }
 .empty-state { min-height: 20rem; padding: 3rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px dashed #d7ddd7; border-radius: .9rem; background: rgba(255,255,255,.42); }
 .empty-icon { width: 3rem; height: 3rem; margin-bottom: 1rem; display: grid; place-items: center; border-radius: 50%; background: #eaf2ea; color: #3d7757; }
 .empty-icon svg { width: 1.1rem; }
@@ -746,6 +749,8 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .archive-toggle, .check-field { display: flex; align-items: center; gap: .5rem; color: #69746d; font-size: .68rem; }
 .archive-toggle input, .check-field input { accent-color: #2c6d4d; }
 .check-field { margin: .4rem 0 1.15rem; }
+.check-field > span { display: flex; flex-direction: column; gap: .18rem; }
+.check-field small { color: #849087; font-size: .62rem; font-weight: 400; line-height: 1.45; }
 .resource-list-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .85rem; }
 .resource-card-wrap { position: relative; }
 .resource-card-wrap > .account-card, .resource-card-wrap > .bucket-card { min-height: 12rem; }
@@ -870,4 +875,11 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   .resource-grid { grid-template-columns: 1fr; }
   .transaction-row { grid-template-columns: 2.3rem minmax(0,1fr) auto; padding: .75rem; gap: .65rem; }
   .void-badge { grid-column: 2; width: fit-content; }
+}
+.field-error {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--danger);
+  font-size: 0.82rem;
+  font-style: normal;
 }

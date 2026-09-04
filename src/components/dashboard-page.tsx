@@ -25,8 +25,8 @@ export function DashboardPage() {
         action={<ActionLink href="/add?flow=income">Add income<Plus /></ActionLink>}
       />
       <section className="hero-balance" aria-labelledby="total-money">
-        <div><p id="total-money">Total financial position</p><MoneyAmount value={data.totalFinancialPositionMinor} /><span>Across every active and archived account included in your financial position.</span></div>
-        <div className="balance-support"><Metric label="Assigned to purposes" value={data.totalBucketBalanceMinor ?? data.availableBucketBalanceMinor ?? 0} /><Metric label="Still unallocated" value={data.unallocatedAmountMinor} accent={data.unallocatedAmountMinor > 0} /></div>
+        <div><p id="total-money">Total financial position</p><MoneyAmount value={data.totalFinancialPositionMinor} /><span>Only accounts marked “Include in financial position” contribute here. Excluded accounts keep their full balances.</span></div>
+        <div className="balance-support"><Metric label="Total physical money" value={data.totalPhysicalAccountBalanceMinor ?? data.totalAccountBalanceMinor ?? 0} /><Metric label="Assigned to purposes" value={data.totalBucketBalanceMinor ?? data.availableBucketBalanceMinor ?? 0} /><Metric label="Still unallocated" value={data.unallocatedAmountMinor} accent={data.unallocatedAmountMinor > 0} /></div>
       </section>
       <section className="month-strip" aria-label="Current month summary">
         <Metric label="Money in" value={data.currentMonth.incomeMinor} tone="positive" />

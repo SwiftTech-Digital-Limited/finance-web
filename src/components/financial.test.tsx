@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { AllocationBreakdown, TransactionRow } from "./financial";
+import { AccountCard, AllocationBreakdown, TransactionRow } from "./financial";
 
 describe("financial presentation", () => {
   it("renders matched and fixed allocation preview from server arrays", () => {
@@ -23,5 +23,12 @@ describe("financial presentation", () => {
     render(<TransactionRow linked={false} event={{ _id: "r", eventKind: "reallocation", amountMinor: 500000 }} />);
     expect(screen.getByText("Bucket reallocation")).toBeInTheDocument();
     expect(screen.getByText(/Purpose changed/i)).toBeInTheDocument();
+  });
+  it("keeps an excluded account's physical balance visible", () => {
+    const card = render(<AccountCard account={{ _id: "a", name: "GTBank", type: "bank", openingBalanceMinor: 500000, currentBalanceMinor: 500000, includeInNetWorth: false }} />);
+    const accountCard = within(card.container);
+    expect(accountCard.getByText("Excluded from total")).toBeInTheDocument();
+    expect(accountCard.getByText("Physical balance")).toBeInTheDocument();
+    expect(accountCard.getByText(/5,000\.00/)).toBeInTheDocument();
   });
 });

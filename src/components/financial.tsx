@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CircleDot, FolderInput, RotateCcw } from "lucide-react";
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CircleDot, EyeOff, FolderInput, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import type { Account, Bucket, FinancialEvent, Transaction } from "@/lib/api/types";
 import { MoneyAmount, ArchivedBadge } from "@/components/ui-kit";
@@ -18,7 +18,7 @@ export function refName(value: unknown, fallback = "Unavailable") {
 export function AccountCard({ account }: { account: Account }) {
   return (
     <Link className="account-card" href={`/accounts/${account._id}`}>
-      <div className="resource-card-top"><span className="account-symbol">{account.name.slice(0, 2).toUpperCase()}</span>{account.isArchived && <ArchivedBadge />}</div>
+      <div className="resource-card-top"><span className="account-symbol">{account.name.slice(0, 2).toUpperCase()}</span><span className="resource-statuses">{account.includeInNetWorth === false && <span className="position-badge"><EyeOff />Excluded from total</span>}{account.isArchived && <ArchivedBadge />}</span></div>
       <div><p className="resource-kicker">{account.institutionName || account.type}</p><h3>{account.name}</h3></div>
       <div className="resource-balance"><span>Physical balance</span><MoneyAmount value={account.currentBalanceMinor ?? account.openingBalanceMinor ?? 0} currency={account.currency} /></div>
     </Link>

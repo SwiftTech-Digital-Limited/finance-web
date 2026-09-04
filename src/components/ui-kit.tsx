@@ -54,7 +54,7 @@ export function EmptyState({
 }: {
   title: string;
   description: string;
-  action?: { href: string; label: string };
+  action?: { label: string; href?: string; onClick?: () => void };
   icon?: typeof Inbox;
 }) {
   return (
@@ -62,7 +62,11 @@ export function EmptyState({
       <span className="empty-icon"><Icon aria-hidden="true" /></span>
       <h2>{title}</h2>
       <p>{description}</p>
-      {action && <ActionLink href={action.href}>{action.label}<Plus aria-hidden="true" /></ActionLink>}
+      {action?.onClick ? (
+        <button className="button-primary" type="button" onClick={action.onClick}>{action.label}<Plus aria-hidden="true" /></button>
+      ) : action?.href ? (
+        <ActionLink href={action.href}>{action.label}<Plus aria-hidden="true" /></ActionLink>
+      ) : null}
     </div>
   );
 }
