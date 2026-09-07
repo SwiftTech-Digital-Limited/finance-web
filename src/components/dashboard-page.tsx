@@ -27,7 +27,14 @@ export function DashboardPage() {
     queryKey: queryKeys.dashboard,
     queryFn: financeApi.dashboard,
   });
-  if (query.isLoading)
+  const dashboardData = query.data;
+  const monthlySetting = useQuery({
+    queryKey: ["finance", "monthly-setting", dashboardData?.currentMonth.year, dashboardData?.currentMonth.month],
+    queryFn: () => financeApi.monthlySetting(dashboardData!.currentMonth.year, dashboardData!.currentMonth.month),
+    enabled: Boolean(dashboardData?.currentMonth),
+    retry: false,
+  });
+  if (query.isLoading || (query.data && monthlySetting.isLoading))
     return (
       <>
         <PageHeader eyebrow="Overview" title="Your money, with purpose" />
@@ -113,9 +120,7 @@ export function DashboardPage() {
           }
         />
       </section>
-      {data.spendingTargetProgress && (
-        <SpendingProgress progress={data.spendingTargetProgress} />
-      )}
+      <SpendingProgress progress={data.spendingTargetProgress} setting={monthlySetting.data} loading={monthlySetting.isLoading} />
       <div className="dashboard-columns">
         <section className="dashboard-section">
           <SectionHeading
@@ -228,45 +233,31 @@ function SectionHeading({
 }
 function SpendingProgress({
   progress,
+  setting,
+  loading,
 }: {
-  progress: NonNullable<
-    import("@/lib/api/types").DashboardData["spendingTargetProgress"]
-  >;
+  progress: import("@/lib/api/types").DashboardData["spendingTargetProgress"];
+  setting?: { idealSpendMinor: number; maximumSpendMinor: number };
+  loading: boolean;
 }) {
-  const ideal = progress.idealSpendMinor || 0;
-  const maximum = progress.maximumSpendMinor || Math.max(ideal, 1);
-  const spent = progress.spentMinor || 0;
-  const percent = Math.min(100, Math.round((spent / maximum) * 100));
-  const message =
-    spent <= ideal
-      ? `${formatMoney(Math.max(0, ideal - spent))} left before your ideal`
-      : spent <= maximum
-        ? `${formatMoney(maximum - spent)} left before your maximum`
-        : `${formatMoney(spent - maximum)} above your preferred maximum`;
+  if (loading) return <section className="spending-progress spending-progress-loading"><div className="spending-skeleton" /></section>;
+  if (!progress || !setting) return (
+    <section className="spending-progress spending-progress-empty">
+      <div><p className="eyebrow">Monthly spending boundary</p><h2>Set monthly spending targets</h2><p>Choose an ideal and maximum spend so this dashboard can show your boundary.</p></div>
+      <Link className="button-secondary" href="/monthly-spending">Set targets</Link>
+    </section>
+  );
+  const spent = progress.spentThisMonthMinor ?? 0;
+  const ideal = setting.idealSpendMinor;
+  const maximum = setting.maximumSpendMinor;
+  const percent = maximum > 0 ? Math.min((spent / maximum) * 100, 100) : 0;
+  const status = progress.status;
+  const message = status === "above_max" ? `${formatMoney(progress.amountAboveMaximumMinor ?? 0)} above your maximum` : status === "between_ideal_and_max" ? `${formatMoney(progress.amountAboveIdealMinor ?? 0)} above your ideal` : `${formatMoney(progress.remainingToIdealMinor ?? 0)} left before your ideal`;
   return (
-    <section className="spending-progress">
-      <header>
-        <div>
-          <p className="eyebrow">Monthly spending boundary</p>
-          <h2>{message}</h2>
-        </div>
-        <span>{percent}% of maximum</span>
-      </header>
-      <div className="progress-track">
-        <span style={{ width: `${percent}%` }} />
-        <i style={{ left: `${Math.min(100, (ideal / maximum) * 100)}%` }} />
-      </div>
-      <footer>
-        <span>
-          Spent <b>{formatMoney(spent)}</b>
-        </span>
-        <span>
-          Ideal <b>{formatMoney(ideal)}</b>
-        </span>
-        <span>
-          Maximum <b>{formatMoney(maximum)}</b>
-        </span>
-      </footer>
+    <section className={`spending-progress ${status === "above_max" ? "spending-alert" : ""}`}>
+      <header><div><p className="eyebrow">Monthly spending boundary</p><h2>{message}</h2></div><span>{Math.round(percent)}% of maximum</span></header>
+      <div className="progress-track"><span style={{ width: `${percent}%` }} /><i style={{ left: `${maximum > 0 ? Math.min((ideal / maximum) * 100, 100) : 0}%` }} /></div>
+      <footer><span>Spent <b>{formatMoney(spent)}</b></span><span>Ideal <b>{formatMoney(ideal)}</b></span><span>Maximum <b>{formatMoney(maximum)}</b></span></footer>
     </section>
   );
 }

@@ -59,19 +59,19 @@ export function BackfillActivityEditor({
         <span>{saving ? "Saving…" : "Saved to server draft"}</span>
       </header>
       <div className="activity-actions">
-        <button onClick={() => add("income")}>
+        <button type="button" onClick={() => add("income")}>
           <CircleDollarSign />
           Add income
         </button>
-        <button onClick={() => add("expense")}>
+        <button type="button" onClick={() => add("expense")}>
           <ReceiptText />
           Add expense
         </button>
-        <button onClick={() => add("transfer")}>
+        <button type="button" onClick={() => add("transfer")}>
           <ArrowLeftRight />
           Transfer
         </button>
-        <button onClick={() => add("reallocation")}>
+        <button type="button" onClick={() => add("reallocation")}>
           <FolderInput />
           Reallocate
         </button>

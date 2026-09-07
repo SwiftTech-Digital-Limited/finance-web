@@ -193,6 +193,9 @@ export interface SpendingProgress {
   idealSpendMinor?: number;
   maximumSpendMinor?: number;
   spentMinor?: number;
+  spentThisMonthMinor?: number;
+  amountAboveIdealMinor?: number;
+  amountAboveMaximumMinor?: number;
   status?: "below_ideal" | "between_ideal_and_max" | "above_max";
   remainingToIdealMinor?: number;
   remainingToMaximumMinor?: number;
