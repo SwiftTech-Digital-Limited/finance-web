@@ -11,12 +11,20 @@ const account = { _id: "account-1", name: "GTBank" } as Account;
 
 describe("incomeSourceDefaultAccountName", () => {
   it("resolves an unpopulated account ID from the accounts response", () => {
-    const source = { _id: "source-1", name: "Lessons", defaultAccountId: "account-1" } as IncomeSource;
+    const source = {
+      _id: "source-1",
+      name: "Lessons",
+      defaultAccountId: "account-1",
+    } as IncomeSource;
     expect(incomeSourceDefaultAccountName(source, [account])).toBe("GTBank");
   });
 
   it("uses a populated default account directly", () => {
-    const source = { _id: "source-1", name: "Lessons", defaultAccountId: account } as IncomeSource;
+    const source = {
+      _id: "source-1",
+      name: "Lessons",
+      defaultAccountId: account,
+    } as IncomeSource;
     expect(incomeSourceDefaultAccountName(source, [])).toBe("GTBank");
   });
 
@@ -36,7 +44,9 @@ describe("income source form validation", () => {
     const error = new ApiError("VALIDATION_ERROR", "Invalid request", 400, [
       { path: ["defaultAccountId"], message: "Choose a valid account." },
     ]);
-    expect(validationFieldError(error, "defaultAccountId")).toBe("Choose a valid account.");
+    expect(validationFieldError(error, "defaultAccountId")).toBe(
+      "Choose a valid account.",
+    );
     expect(validationFieldError(error, "name")).toBeUndefined();
   });
 });

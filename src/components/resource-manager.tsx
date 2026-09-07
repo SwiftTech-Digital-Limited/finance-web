@@ -141,8 +141,12 @@ export function ResourceManager({ kind }: { kind: Kind }) {
     queryFn: () => listResource(kind, params),
   });
   const accountsQuery = useQuery({
-    queryKey: queryKeys.resource("accounts", { limit: 100, includeArchived: true }),
-    queryFn: () => listResource("accounts", { limit: 100, includeArchived: true }),
+    queryKey: queryKeys.resource("accounts", {
+      limit: 100,
+      includeArchived: true,
+    }),
+    queryFn: () =>
+      listResource("accounts", { limit: 100, includeArchived: true }),
     enabled: kind === "income-sources",
   });
   const mutation = useMutation({
@@ -323,11 +327,18 @@ export function ResourceManager({ kind }: { kind: Kind }) {
   );
 }
 
-export function incomeSourceDefaultAccountName(source: IncomeSource, accounts: Account[]) {
+export function incomeSourceDefaultAccountName(
+  source: IncomeSource,
+  accounts: Account[],
+) {
   const reference = source.defaultAccountId;
   if (!reference) return "None";
-  if (typeof reference !== "string") return refName(reference, "Unavailable account");
-  return accounts.find((account) => account._id === reference)?.name || "Unavailable account";
+  if (typeof reference !== "string")
+    return refName(reference, "Unavailable account");
+  return (
+    accounts.find((account) => account._id === reference)?.name ||
+    "Unavailable account"
+  );
 }
 
 function CardActions({
@@ -455,7 +466,10 @@ function ResourceForm({
       <form onSubmit={submit}>
         <Field
           label="Name"
-          error={form.formState.errors.name?.message || validationFieldError(error, "name")}
+          error={
+            form.formState.errors.name?.message ||
+            validationFieldError(error, "name")
+          }
         >
           <input autoFocus {...form.register("name")} />
         </Field>
@@ -488,7 +502,13 @@ function ResourceForm({
             )}
             <label className="check-field">
               <input type="checkbox" {...form.register("includeInNetWorth")} />
-              <span>Include in financial position<small>The account and its balance remain unchanged when excluded; only the dashboard total changes.</small></span>
+              <span>
+                Include in financial position
+                <small>
+                  The account and its balance remain unchanged when excluded;
+                  only the dashboard total changes.
+                </small>
+              </span>
             </label>
           </>
         )}
@@ -549,11 +569,15 @@ export function optionalDefaultAccountId(value: string) {
 }
 
 export function validationFieldError(error: unknown, field: string) {
-  if (!(error instanceof ApiError) || !Array.isArray(error.details)) return undefined;
+  if (!(error instanceof ApiError) || !Array.isArray(error.details))
+    return undefined;
   const issue = error.details.find((detail) => {
-    if (!detail || typeof detail !== "object" || !("path" in detail)) return false;
+    if (!detail || typeof detail !== "object" || !("path" in detail))
+      return false;
     const path = (detail as { path?: unknown }).path;
-    return Array.isArray(path) ? String(path.at(-1)) === field : String(path) === field;
+    return Array.isArray(path)
+      ? String(path.at(-1)) === field
+      : String(path) === field;
   });
   return issue && typeof issue === "object" && "message" in issue
     ? String((issue as { message: unknown }).message)

@@ -1,2 +1,4 @@
 import { ResourceManager } from "@/components/resource-manager";
-export default function Page() { return <ResourceManager kind="accounts" />; }
+export default function Page() {
+  return <ResourceManager kind="accounts" />;
+}

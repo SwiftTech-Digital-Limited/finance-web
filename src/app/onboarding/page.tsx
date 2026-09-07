@@ -1,2 +1,4 @@
 import { OnboardingPage } from "@/components/onboarding-page";
-export default function Page() { return <OnboardingPage />; }
+export default function Page() {
+  return <OnboardingPage />;
+}

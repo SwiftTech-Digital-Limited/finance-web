@@ -57,23 +57,47 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   return (
     <main className="auth-shell">
       <section className="auth-story" aria-labelledby="story-title">
-        <Link className="brand-mark" href="/">{PRODUCT_NAME}<span>.</span></Link>
+        <Link className="brand-mark" href="/">
+          {PRODUCT_NAME}
+          <span>.</span>
+        </Link>
         <div className="auth-story-copy">
           <p className="eyebrow">Money with a clear purpose</p>
-          <h1 id="story-title">Know where it lives.<br />Decide what it does.</h1>
-          <p>Build calm, programmable cash flow around the way your income actually arrives.</p>
+          <h1 id="story-title">
+            Know where it lives.
+            <br />
+            Decide what it does.
+          </h1>
+          <p>
+            Build calm, programmable cash flow around the way your income
+            actually arrives.
+          </p>
           <div className="trust-note">
             <ShieldCheck aria-hidden="true" />
-            <span>Your balances stay grounded in the server’s ledgers—never browser guesswork.</span>
+            <span>
+              Your balances stay grounded in the server’s ledgers—never browser
+              guesswork.
+            </span>
           </div>
         </div>
-        <p className="auth-footnote">Accounts are where money lives. Buckets are what it’s for.</p>
+        <p className="auth-footnote">
+          Accounts are where money lives. Buckets are what it’s for.
+        </p>
       </section>
       <section className="auth-panel" aria-labelledby="auth-title">
         <div className="auth-card">
-          <p className="mobile-brand">{PRODUCT_NAME}<span>.</span></p>
-          <p className="eyebrow">{mode === "login" ? "Welcome back" : "Start with intention"}</p>
-          <h2 id="auth-title">{mode === "login" ? "Sign in to your money plan" : "Create your account"}</h2>
+          <p className="mobile-brand">
+            {PRODUCT_NAME}
+            <span>.</span>
+          </p>
+          <p className="eyebrow">
+            {mode === "login" ? "Welcome back" : "Start with intention"}
+          </p>
+          <h2 id="auth-title">
+            {mode === "login"
+              ? "Sign in to your money plan"
+              : "Create your account"}
+          </h2>
           <p className="auth-subtitle">
             {mode === "login"
               ? "Continue assigning every naira a job."
@@ -81,11 +105,21 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </p>
           <form onSubmit={submit} noValidate>
             {mode === "register" && (
-              <Field label="Full name" error={form.formState.errors.name?.message}>
-                <input autoComplete="name" placeholder="Ada Okafor" {...form.register("name")} />
+              <Field
+                label="Full name"
+                error={form.formState.errors.name?.message}
+              >
+                <input
+                  autoComplete="name"
+                  placeholder="Ada Okafor"
+                  {...form.register("name")}
+                />
               </Field>
             )}
-            <Field label="Email address" error={form.formState.errors.email?.message}>
+            <Field
+              label="Email address"
+              error={form.formState.errors.email?.message}
+            >
               <input
                 type="email"
                 autoComplete="email"
@@ -102,7 +136,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               <div className="password-field">
                 <input
                   type={showPassword ? "text" : "password"}
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  autoComplete={
+                    mode === "login" ? "current-password" : "new-password"
+                  }
                   placeholder="Your secure password"
                   {...form.register("password")}
                 />
@@ -116,12 +152,20 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               </div>
             </Field>
             {serverError && (
-              <p className="form-error form-error-box" role="alert">{serverError}</p>
+              <p className="form-error form-error-box" role="alert">
+                {serverError}
+              </p>
             )}
-            <button className="primary-action" type="submit" disabled={form.formState.isSubmitting}>
+            <button
+              className="primary-action"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+            >
               {form.formState.isSubmitting
                 ? "Please wait…"
-                : mode === "login" ? "Sign in" : "Create account"}
+                : mode === "login"
+                  ? "Sign in"
+                  : "Create account"}
               <ArrowRight aria-hidden="true" />
             </button>
           </form>
@@ -150,7 +194,10 @@ function Field({
 }) {
   return (
     <label className="field">
-      <span><b>{label}</b>{hint && <small>{hint}</small>}</span>
+      <span>
+        <b>{label}</b>
+        {hint && <small>{hint}</small>}
+      </span>
       {children}
       {error && <em role="alert">{error}</em>}
     </label>

@@ -16,7 +16,9 @@ describe("EmptyState", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add income source/i }));
+    await user.click(
+      screen.getByRole("button", { name: /add income source/i }),
+    );
     expect(onClick).toHaveBeenCalledOnce();
   });
 });

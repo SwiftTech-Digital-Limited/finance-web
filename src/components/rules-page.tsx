@@ -149,7 +149,10 @@ export function RulesPage() {
         <EmptyState
           title="No allocation rules yet"
           description="Teach the app what should happen when money arrives."
-          action={{ label: "Create your first rule", onClick: () => setEditing("new") }}
+          action={{
+            label: "Create your first rule",
+            onClick: () => setEditing("new"),
+          }}
         />
       ) : (
         <div className="rules-list">
@@ -452,7 +455,9 @@ function RuleEditor({
             ))}
           </select>
           {ruleValidationError(error, "incomeSourceId") && (
-            <em className="field-error" role="alert">{ruleValidationError(error, "incomeSourceId")}</em>
+            <em className="field-error" role="alert">
+              {ruleValidationError(error, "incomeSourceId")}
+            </em>
           )}
           <label>
             <input
@@ -485,7 +490,9 @@ function RuleEditor({
             <input
               inputMode="decimal"
               placeholder="Minimum NGN"
-              aria-invalid={Boolean(ruleValidationError(error, "minimumAmountMinor"))}
+              aria-invalid={Boolean(
+                ruleValidationError(error, "minimumAmountMinor"),
+              )}
               value={state.minimum}
               onChange={(event) =>
                 setState({ ...state, minimum: event.target.value })
@@ -496,7 +503,9 @@ function RuleEditor({
             <input
               inputMode="decimal"
               placeholder="Maximum NGN"
-              aria-invalid={Boolean(ruleValidationError(error, "maximumAmountMinor"))}
+              aria-invalid={Boolean(
+                ruleValidationError(error, "maximumAmountMinor"),
+              )}
               value={state.maximum}
               onChange={(event) =>
                 setState({ ...state, maximum: event.target.value })
@@ -549,7 +558,9 @@ function RuleEditor({
             />
           ))}
           {ruleValidationError(error, "fixedAllocations") && (
-            <em className="field-error" role="alert">{ruleValidationError(error, "fixedAllocations")}</em>
+            <em className="field-error" role="alert">
+              {ruleValidationError(error, "fixedAllocations")}
+            </em>
           )}
         </section>
         <section>
@@ -586,7 +597,9 @@ function RuleEditor({
             />
           ))}
           {ruleValidationError(error, "percentageAllocations") && (
-            <em className="field-error" role="alert">{ruleValidationError(error, "percentageAllocations")}</em>
+            <em className="field-error" role="alert">
+              {ruleValidationError(error, "percentageAllocations")}
+            </em>
           )}
           <button
             className="add-split"
@@ -615,7 +628,10 @@ function RuleEditor({
                 }
               />
             </Field>
-            <Field label="Priority" error={ruleValidationError(error, "priority")}>
+            <Field
+              label="Priority"
+              error={ruleValidationError(error, "priority")}
+            >
               <input
                 type="number"
                 value={state.priority}
@@ -624,7 +640,10 @@ function RuleEditor({
                 }
               />
             </Field>
-            <Field label="Description" error={ruleValidationError(error, "description")}>
+            <Field
+              label="Description"
+              error={ruleValidationError(error, "description")}
+            >
               <textarea
                 rows={2}
                 value={state.description}
@@ -688,11 +707,15 @@ export function optionalRuleMatchingFields(
 }
 
 export function ruleValidationError(error: unknown, field: string) {
-  if (!(error instanceof ApiError) || !Array.isArray(error.details)) return undefined;
+  if (!(error instanceof ApiError) || !Array.isArray(error.details))
+    return undefined;
   const issue = error.details.find((detail) => {
-    if (!detail || typeof detail !== "object" || !("path" in detail)) return false;
+    if (!detail || typeof detail !== "object" || !("path" in detail))
+      return false;
     const path = (detail as { path?: unknown }).path;
-    return Array.isArray(path) ? path.map(String).includes(field) : String(path) === field;
+    return Array.isArray(path)
+      ? path.map(String).includes(field)
+      : String(path) === field;
   });
   return issue && typeof issue === "object" && "message" in issue
     ? String((issue as { message: unknown }).message)

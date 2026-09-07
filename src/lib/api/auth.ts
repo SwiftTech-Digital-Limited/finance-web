@@ -24,14 +24,20 @@ export function restoreSession() {
 export const authApi = {
   async register(input: { name: string; email: string; password: string }) {
     const result = await apiData<AuthResult>("/auth/register", {
-      method: "POST", body: input, auth: false, retry401: false,
+      method: "POST",
+      body: input,
+      auth: false,
+      retry401: false,
     });
     setAccessToken(result.accessToken);
     return result;
   },
   async login(input: { email: string; password: string }) {
     const result = await apiData<AuthResult>("/auth/login", {
-      method: "POST", body: input, auth: false, retry401: false,
+      method: "POST",
+      body: input,
+      auth: false,
+      retry401: false,
     });
     setAccessToken(result.accessToken);
     return result;
@@ -43,7 +49,9 @@ export const authApi = {
   async logout() {
     try {
       await apiData<unknown>("/auth/logout", {
-        method: "POST", auth: false, retry401: false,
+        method: "POST",
+        auth: false,
+        retry401: false,
       });
     } finally {
       setAccessToken(null);

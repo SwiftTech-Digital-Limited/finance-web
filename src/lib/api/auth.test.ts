@@ -10,16 +10,21 @@ describe("session restoration", () => {
 
   it("uses one rotating refresh request for concurrent restoration calls", async () => {
     let release: (() => void) | undefined;
-    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
     const fetchMock = vi.fn(async () => {
       await gate;
-      return new Response(JSON.stringify({
-        success: true,
-        data: {
-          user: { _id: "user-1", name: "Ada", email: "ada@example.com" },
-          accessToken: "new-access-token",
-        },
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            user: { _id: "user-1", name: "Ada", email: "ada@example.com" },
+            accessToken: "new-access-token",
+          },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
     });
     vi.stubGlobal("fetch", fetchMock);
 

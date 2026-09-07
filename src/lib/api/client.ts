@@ -18,9 +18,15 @@ export class ApiError extends Error {
   }
 }
 
-export function setAccessToken(token: string | null) { accessToken = token; }
-export function getAccessToken() { return accessToken; }
-export function onAuthFailure(handler: (() => void) | null) { authFailureHandler = handler; }
+export function setAccessToken(token: string | null) {
+  accessToken = token;
+}
+export function getAccessToken() {
+  return accessToken;
+}
+export function onAuthFailure(handler: (() => void) | null) {
+  authFailureHandler = handler;
+}
 
 function isErrorBody(value: unknown): value is ApiErrorBody {
   return Boolean(
@@ -33,11 +39,16 @@ function isErrorBody(value: unknown): value is ApiErrorBody {
 
 async function readResponse<T>(response: Response): Promise<ApiEnvelope<T>> {
   let body: unknown;
-  try { body = await response.json(); } catch { body = null; }
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
   if (!response.ok || isErrorBody(body)) {
     const error = isErrorBody(body) ? body.error : null;
     throw new ApiError(
-      error?.code || (response.status === 401 ? "UNAUTHORIZED" : "NETWORK_ERROR"),
+      error?.code ||
+        (response.status === 401 ? "UNAUTHORIZED" : "NETWORK_ERROR"),
       error?.message || "We couldn’t complete that request. Please try again.",
       response.status,
       error?.details,
@@ -45,7 +56,11 @@ async function readResponse<T>(response: Response): Promise<ApiEnvelope<T>> {
     );
   }
   if (!body || typeof body !== "object" || !("success" in body)) {
-    throw new ApiError("INVALID_RESPONSE", "The server returned an unexpected response.", response.status);
+    throw new ApiError(
+      "INVALID_RESPONSE",
+      "The server returned an unexpected response.",
+      response.status,
+    );
   }
   return body as ApiEnvelope<T>;
 }
@@ -67,7 +82,9 @@ async function refreshAccessToken() {
         authFailureHandler?.();
         return false;
       })
-      .finally(() => { refreshPromise = null; });
+      .finally(() => {
+        refreshPromise = null;
+      });
   }
   return refreshPromise;
 }
@@ -83,14 +100,23 @@ export async function apiRequest<T>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<ApiEnvelope<T>> {
-  const { body, auth = true, retry401 = true, timeoutMs = 15_000, headers, ...init } = options;
+  const {
+    body,
+    auth = true,
+    retry401 = true,
+    timeoutMs = 15_000,
+    headers,
+    ...init
+  } = options;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const requestHeaders = new Headers(headers);
     requestHeaders.set("Accept", "application/json");
-    if (body !== undefined) requestHeaders.set("Content-Type", "application/json");
-    if (auth && accessToken) requestHeaders.set("Authorization", `Bearer ${accessToken}`);
+    if (body !== undefined)
+      requestHeaders.set("Content-Type", "application/json");
+    if (auth && accessToken)
+      requestHeaders.set("Authorization", `Bearer ${accessToken}`);
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       credentials: "include",
@@ -98,15 +124,25 @@ export async function apiRequest<T>(
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: controller.signal,
     });
-    if (response.status === 401 && auth && retry401 && !path.startsWith("/auth/")) {
+    if (
+      response.status === 401 &&
+      auth &&
+      retry401 &&
+      !path.startsWith("/auth/")
+    ) {
       const refreshed = await refreshAccessToken();
-      if (refreshed) return apiRequest<T>(path, { ...options, retry401: false });
+      if (refreshed)
+        return apiRequest<T>(path, { ...options, retry401: false });
     }
     return await readResponse<T>(response);
   } catch (error) {
     if (error instanceof ApiError) throw error;
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new ApiError("REQUEST_TIMEOUT", "The server took too long to respond.", 0);
+      throw new ApiError(
+        "REQUEST_TIMEOUT",
+        "The server took too long to respond.",
+        0,
+      );
     }
     throw new ApiError(
       "NETWORK_ERROR",
@@ -123,7 +159,8 @@ export function toQuery(
 ) {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== "") query.set(key, String(value));
+    if (value !== undefined && value !== null && value !== "")
+      query.set(key, String(value));
   }
   const serialized = query.toString();
   return serialized ? `?${serialized}` : "";
