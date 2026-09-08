@@ -104,7 +104,7 @@ export async function apiRequest<T>(
     body,
     auth = true,
     retry401 = true,
-    timeoutMs = 15_000,
+    timeoutMs = 60_000,
     headers,
     ...init
   } = options;
