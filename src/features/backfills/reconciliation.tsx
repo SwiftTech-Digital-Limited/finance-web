@@ -99,8 +99,7 @@ export function ReconciliationSummary({
           return (
             <div key={bucket.bucketId}>
               <b>
-                {bucket.bucketName ||
-                  nameOf(resources.buckets, bucket.bucketId)}
+                {bucketLabel(bucket.bucketId, resources.buckets, bucket.bucketName)}
               </b>
               <span>
                 {formatMoney(bucket.amountMinor)} →{" "}
@@ -406,6 +405,9 @@ function Total({ label, value }: { label: string; value: number }) {
       <b>{formatMoney(value)}</b>
     </div>
   );
+}
+function bucketLabel(id: string, buckets: Array<{ _id: string; name: string }>, fallback?: string) {
+  return buckets.find((bucket) => bucket._id === id)?.name || fallback || "Unavailable";
 }
 function nameOf(items: Array<{ _id: string; name: string }>, id: string) {
   return items.find((item) => item._id === id)?.name || "Unavailable";
