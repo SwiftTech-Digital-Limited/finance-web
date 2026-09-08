@@ -37,6 +37,6 @@ export default defineConfig({
     baseURL:
       process.env.E2E_API_BASE_URL ||
       process.env.NEXT_PUBLIC_API_BASE_URL ||
-      "https://koboplan-backend.up.railway.app",
+      "https://koboplan-backend.up.railway.app/api/v1",
   },
 });
