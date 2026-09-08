@@ -191,8 +191,14 @@ export function TransactionRow({
   );
 }
 
+function bucketName(id: unknown, buckets: { _id: string; name: string }[], fallback?: string) {
+  const key = typeof id === "string" ? id : id && typeof id === "object" && "_id" in id ? String((id as { _id: unknown })._id) : "";
+  return buckets.find((bucket) => bucket._id === key)?.name || fallback || refName(id, "Bucket");
+}
+
 export function AllocationBreakdown({
   preview,
+  buckets = [],
 }: {
   preview: {
     amountMinor: number;
@@ -214,6 +220,7 @@ export function AllocationBreakdown({
     unallocatedAmountMinor: number;
     warnings?: string[];
   };
+  buckets?: { _id: string; name: string }[];
 }) {
   return (
     <section className="allocation-breakdown">
@@ -234,7 +241,7 @@ export function AllocationBreakdown({
           {preview.fixedAllocations.map((item, index) => (
             <div key={index}>
               <span>
-                {item.bucketName || refName(item.bucketId, "Bucket")}{" "}
+                {bucketName(item.bucketId, buckets, item.bucketName)}{" "}
                 <small>fixed</small>
               </span>
               <MoneyAmount value={item.amountMinor || 0} />
@@ -251,7 +258,7 @@ export function AllocationBreakdown({
           {preview.percentageAllocations.map((item, index) => (
             <div key={index}>
               <span>
-                {item.bucketName || refName(item.bucketId, "Bucket")}{" "}
+                {bucketName(item.bucketId, buckets, item.bucketName)}{" "}
                 <small>{(item.percentageBps || 0) / 100}%</small>
               </span>
               <MoneyAmount value={item.amountMinor || 0} />

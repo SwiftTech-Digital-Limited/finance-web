@@ -611,7 +611,7 @@ export function AddMoneyPage() {
                   : "Change purpose"}
           </SubmitButton>
         </form>
-        {preview && <AllocationBreakdown preview={preview} />}
+        {preview && <AllocationBreakdown preview={preview} buckets={buckets} />}
       </div>
     </>
   );

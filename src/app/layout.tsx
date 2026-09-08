@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         playfairDisplayHeading.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
