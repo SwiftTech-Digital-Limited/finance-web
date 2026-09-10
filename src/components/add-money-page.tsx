@@ -124,13 +124,31 @@ const flowCopy: Record<
 export function AddMoneyPage() {
   const params = useSearchParams();
   const requested = params.get("flow");
-  const [flow, setFlow] = useState<Flow>(
+  const flow: Flow =
     requested === "expense" ||
-      requested === "transfer" ||
-      requested === "reallocate"
+    requested === "transfer" ||
+    requested === "reallocate"
       ? requested
-      : "income",
-  );
+      : "income";
+  const changeFlow = (next: Flow) => {
+    if (next === flow) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("flow", next);
+    window.history.pushState(null, "", url.pathname + url.search + url.hash);
+  };
+
+  // A new form instance keeps registered inputs and validation state together,
+  // including when React Compiler memoizes the input elements.
+  return <MoneyFlowForm key={flow} flow={flow} onFlowChange={changeFlow} />;
+}
+
+function MoneyFlowForm({
+  flow,
+  onFlowChange,
+}: {
+  flow: Flow;
+  onFlowChange: (next: Flow) => void;
+}) {
   const [preview, setPreview] = useState<AllocationPreview | null>(null);
   const [success, setSuccess] = useState<{
     title: string;
@@ -337,13 +355,6 @@ export function AddMoneyPage() {
     },
   });
 
-  const setFlowSafely = (next: Flow) => {
-    setFlow(next);
-    setPreview(null);
-    setSuccess(null);
-    intentKey.current = null;
-    form.reset({ ...defaults, date: today() });
-  };
   const submit = form.handleSubmit((values) => {
     mutation.reset();
     mutation.mutate(values);
@@ -394,10 +405,12 @@ export function AddMoneyPage() {
           const Icon = flowCopy[key].icon;
           return (
             <button
+              type="button"
+              disabled={mutation.isPending}
               role="tab"
               aria-selected={flow === key}
               className={flow === key ? "active" : ""}
-              onClick={() => setFlowSafely(key)}
+              onClick={() => onFlowChange(key)}
               key={key}
             >
               <Icon />
