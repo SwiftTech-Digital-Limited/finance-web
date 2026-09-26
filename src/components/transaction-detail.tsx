@@ -176,10 +176,7 @@ export function TransactionDetail({ id }: { id: string }) {
             </Detail>
             <Detail label="Date">
               {transaction.transactionDate
-                ? format(
-                    new Date(transaction.transactionDate),
-                    "d MMMM yyyy, h:mm a",
-                  )
+                ? format(new Date(transaction.transactionDate), "d MMMM yyyy")
                 : "Not provided"}
             </Detail>
             <Detail label={transfer ? "From account" : "Account"}>

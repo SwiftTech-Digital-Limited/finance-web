@@ -68,6 +68,23 @@ describe("financial presentation", () => {
     expect(screen.getByText("GTBank to Savings")).toBeInTheDocument();
     expect(screen.getByText(/not spending/i)).toBeInTheDocument();
   });
+  it("labels transfers from the viewed account's perspective", () => {
+    const source = { _id: "source", name: "Savings", type: "savings" as const, openingBalanceMinor: 0 };
+    const destination = { _id: "destination", name: "Main", type: "bank" as const, openingBalanceMinor: 0 };
+    const event = {
+      _id: "transfer",
+      type: "transfer_out" as const,
+      displayType: "transfer",
+      amountMinor: 200000,
+      accountId: source,
+      counterpartAccount: destination,
+    };
+    const view = render(<TransactionRow event={event} viewedAccountId="destination" />);
+    expect(screen.getByText("Incoming transfer from Savings", { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/transactions/transfer");
+    view.rerender(<TransactionRow event={event} viewedAccountId="source" />);
+    expect(screen.getByText("Outgoing transfer to Main", { exact: false })).toBeInTheDocument();
+  });
   it("renders reallocation as a purpose change", () => {
     render(
       <TransactionRow

@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, CircleDot, Landmark, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, CircleDot, Landmark, Plus, Search, Trash2 } from "lucide-react";
 import { financeApi, getResource, listResource, queryKeys } from "@/lib/api";
 import type { Account, Bucket } from "@/lib/api/types";
 import { errorMessage } from "@/lib/errors";
@@ -142,17 +142,7 @@ function AccountDetail({ account }: { account: Account }) {
             </p>
           </div>
         </header>
-        {account.recentTransactions?.length ? (
-          <div className="activity-list">
-            {account.recentTransactions.map((transaction) => (
-              <TransactionRow event={transaction} key={transaction._id} />
-            ))}
-          </div>
-        ) : (
-          <div className="detail-card">
-            <p className="muted-copy">No account activity yet.</p>
-          </div>
-        )}
+        <AccountActivity key={account._id} accountId={account._id} />
       </section>
       <Modal
         open={open}
@@ -227,6 +217,178 @@ function AccountDetail({ account }: { account: Account }) {
           {mutation.isPending ? "Assigning..." : "Assign opening money"}
         </button>
       </Modal>
+    </>
+  );
+}
+
+type ActivityFilterInputs = {
+  search: string;
+  type: string;
+  dateFrom: string;
+  dateTo: string;
+  minAmount: string;
+  maxAmount: string;
+};
+
+const emptyActivityFilters: ActivityFilterInputs = {
+  search: "",
+  type: "",
+  dateFrom: "",
+  dateTo: "",
+  minAmount: "",
+  maxAmount: "",
+};
+
+export function AccountActivity({ accountId }: { accountId: string }) {
+  const [page, setPage] = useState(1);
+  const [inputs, setInputs] = useState<ActivityFilterInputs>(emptyActivityFilters);
+  const [filters, setFilters] = useState<Record<string, string | number>>({});
+  const [filterError, setFilterError] = useState("");
+  const params = {
+    accountId,
+    page,
+    limit: 20,
+    sortBy: "transactionDate",
+    sortOrder: "desc",
+    ...filters,
+  };
+  const query = useQuery({
+    queryKey: queryKeys.transactions(params),
+    queryFn: () => financeApi.transactions(params),
+  });
+  const pagination = query.data?.pagination;
+  const updateInput = (name: keyof ActivityFilterInputs, value: string) =>
+    setInputs((current) => ({ ...current, [name]: value }));
+  const applyFilters = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const minimum = inputs.minAmount.trim()
+      ? parseMoneyInput(inputs.minAmount, true)
+      : null;
+    const maximum = inputs.maxAmount.trim()
+      ? parseMoneyInput(inputs.maxAmount, true)
+      : null;
+    if (minimum?.ok === false || maximum?.ok === false) {
+      setFilterError("Enter valid amounts with no more than 2 decimal places.");
+      return;
+    }
+    if (inputs.dateFrom && inputs.dateTo && inputs.dateFrom > inputs.dateTo) {
+      setFilterError("From date must be before To date.");
+      return;
+    }
+    if (minimum?.ok && maximum?.ok && minimum.amountMinor > maximum.amountMinor) {
+      setFilterError("Minimum amount must be less than maximum amount.");
+      return;
+    }
+    setFilterError("");
+    setPage(1);
+    setFilters({
+      ...(inputs.search.trim() && { search: inputs.search.trim() }),
+      ...(inputs.type && { type: inputs.type }),
+      ...(inputs.dateFrom && { dateFrom: inputs.dateFrom }),
+      ...(inputs.dateTo && { dateTo: inputs.dateTo }),
+      ...(minimum?.ok && { minAmountMinor: minimum.amountMinor }),
+      ...(maximum?.ok && { maxAmountMinor: maximum.amountMinor }),
+    });
+  };
+
+  return (
+    <>
+      <form className="account-activity-filters" onSubmit={applyFilters}>
+        <label className="account-activity-search">
+          <span>Description</span>
+          <span className="search-field">
+            <Search aria-hidden="true" />
+            <input
+              value={inputs.search}
+              onChange={(event) => updateInput("search", event.target.value)}
+              placeholder="Search descriptions"
+            />
+          </span>
+        </label>
+        <label>
+          <span>Type</span>
+          <select value={inputs.type} onChange={(event) => updateInput("type", event.target.value)}>
+            <option value="">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expenses</option>
+            <option value="transfer">Transfers</option>
+          </select>
+        </label>
+        <label>
+          <span>From date</span>
+          <input type="date" value={inputs.dateFrom} onChange={(event) => updateInput("dateFrom", event.target.value)} />
+        </label>
+        <label>
+          <span>To date</span>
+          <input type="date" value={inputs.dateTo} onChange={(event) => updateInput("dateTo", event.target.value)} />
+        </label>
+        <label>
+          <span>Minimum amount</span>
+          <input inputMode="decimal" value={inputs.minAmount} onChange={(event) => updateInput("minAmount", event.target.value)} placeholder="0.00" />
+        </label>
+        <label>
+          <span>Maximum amount</span>
+          <input inputMode="decimal" value={inputs.maxAmount} onChange={(event) => updateInput("maxAmount", event.target.value)} placeholder="0.00" />
+        </label>
+        <div className="account-activity-filter-actions">
+          <button className="button-primary" type="submit">Apply filters</button>
+          <button
+            className="button-secondary"
+            type="button"
+            onClick={() => {
+              setInputs(emptyActivityFilters);
+              setFilters({});
+              setPage(1);
+              setFilterError("");
+            }}
+          >
+            Clear
+          </button>
+        </div>
+        {filterError && <p className="form-error-box" role="alert">{filterError}</p>}
+      </form>
+      {query.isPending ? (
+        <LoadingBlock rows={5} />
+      ) : query.isError ? (
+        <div className="detail-card">
+          <ErrorState error={errorMessage(query.error)} />
+          <button className="button-secondary" onClick={() => query.refetch()}>
+            Retry
+          </button>
+        </div>
+      ) : query.data.items.length ? (
+        <div className="activity-list">
+          {query.data.items.map((transaction) => (
+            <TransactionRow
+              event={transaction}
+              viewedAccountId={accountId}
+              key={transaction._id}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="detail-card">
+          <p className="muted-copy">
+            {Object.keys(filters).length
+              ? "No account activity matches these filters."
+              : "No account activity yet."}
+          </p>
+        </div>
+      )}
+      {!query.isError && pagination && pagination.pages > 1 && (
+        <div className="pagination">
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
+            Previous
+          </button>
+          <span>Page {pagination.page} of {pagination.pages}</span>
+          <button
+            disabled={page >= pagination.pages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </>
   );
 }

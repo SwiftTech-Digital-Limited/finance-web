@@ -92,9 +92,11 @@ export function BucketCard({ bucket }: { bucket: Bucket }) {
 export function TransactionRow({
   event,
   linked = true,
+  viewedAccountId,
 }: {
   event: FinancialEvent | Transaction;
   linked?: boolean;
+  viewedAccountId?: string;
 }) {
   const financialEvent = event as FinancialEvent;
   const reallocation =
@@ -105,6 +107,16 @@ export function TransactionRow({
     event.type === "transfer" ||
     event.type === "transfer_out" ||
     event.type === "transfer_in";
+  const accountId = event.account || event.accountId;
+  const sourceId = typeof accountId === "string" ? accountId : accountId?._id;
+  const destinationId = event.counterpartAccount?._id;
+  const transferDirection = transfer && viewedAccountId
+    ? sourceId === viewedAccountId
+      ? "outgoing"
+      : destinationId === viewedAccountId
+        ? "incoming"
+        : undefined
+    : undefined;
   const expense = event.type === "expense";
   const income = event.type === "income";
   const title = reallocation
@@ -120,7 +132,11 @@ export function TransactionRow({
   const subtitle = reallocation
     ? "Purpose changed; physical money stayed put"
     : transfer
-      ? "Account transfer - not spending"
+      ? transferDirection === "incoming"
+        ? `Incoming transfer from ${refName(accountId, "account")}`
+        : transferDirection === "outgoing"
+          ? `Outgoing transfer to ${refName(event.counterpartAccount, "account")}`
+          : "Account transfer - not spending"
       : income
         ? `Into ${refName(event.account || event.accountId, "account")}`
         : expense
@@ -172,8 +188,8 @@ export function TransactionRow({
       <span
         className={cn(
           "transaction-amount",
-          income && "positive",
-          expense && "negative",
+      (income || transferDirection === "incoming") && "positive",
+      (expense || transferDirection === "outgoing") && "negative",
         )}
       >
         <MoneyAmount value={amount} />
