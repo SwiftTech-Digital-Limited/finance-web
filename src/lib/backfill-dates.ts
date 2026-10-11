@@ -41,7 +41,7 @@ export function serializeZonedDateTime(value: string, timeZone: string) {
         mapped.second,
       ) - instant
     );
-  };
+  }; 
   let offset = offsetAt(wallUtc);
   const instant = wallUtc - offset;
   offset = offsetAt(instant);
